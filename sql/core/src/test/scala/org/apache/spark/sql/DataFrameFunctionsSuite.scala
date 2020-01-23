@@ -194,6 +194,21 @@ class DataFrameFunctionsSuite extends QueryTest with SharedSparkSession {
       Row("one", "not_one"))
   }
 
+  test("misc uuid function") {
+    val uuidSeeded10: Column = uuid(Some(10))
+
+    val df: DataFrame = Seq(Seq(1)).toDF("a")
+    checkAnswer(
+      df.select(uuidSeeded10, uuidSeeded10, uuid(Some(10)), uuid(Some(11))),
+      Row(
+        "9237d6a9-5093-417f-8a65-5723706209e9",
+        "9237d6a9-5093-417f-8a65-5723706209e9",
+        "9237d6a9-5093-417f-8a65-5723706209e9",
+        "932b3a53-27b6-4454-983c-8d9953b84cd6"
+      )
+    )
+  }
+
   test("misc md5 function") {
     val df = Seq(("ABC", Array[Byte](1, 2, 3, 4, 5, 6))).toDF("a", "b")
     checkAnswer(

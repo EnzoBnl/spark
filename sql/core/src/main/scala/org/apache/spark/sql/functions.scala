@@ -2119,6 +2119,15 @@ object functions {
   //////////////////////////////////////////////////////////////////////////////////////////////
 
   /**
+   * Returns an universally unique identifier (UUID) string.
+   * The value is returned as a canonical UUID 36-character string.
+   *
+   * @group misc_funcs
+   * @since 3.0.0
+   */
+  def uuid(seed: Option[Long] = None): Column = withExpr { Uuid(seed) }
+
+  /**
    * Calculates the MD5 digest of a binary column and returns the value
    * as a 32 character hex string.
    *
