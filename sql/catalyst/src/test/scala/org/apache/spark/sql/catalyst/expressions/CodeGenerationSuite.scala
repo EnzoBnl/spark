@@ -420,6 +420,27 @@ class CodeGenerationSuite extends SparkFunSuite with ExpressionEvalHelper {
     assert(ctx.inlinedMutableStates.isEmpty)
   }
 
+  test("`references` array should only contain distinct refs and can be dynamically mutated") {
+    val ctx = new CodegenContext
+
+    val foo = new Object()
+    val bar = new Object()
+    val foobar = new Object()
+    val barfoo = new Object()
+
+    ctx.addReferenceObj("foo1", foo)
+    ctx.addReferenceObj("foo2", foo)
+    ctx.addReferenceObj("bar", bar)
+    ctx.addReferenceObj("foo3", foo)
+    assert(ctx.references.length == 2)
+
+    ctx.addReferenceObj("foobar", foobar)
+    assert(ctx.references.length == 3)
+
+    ctx.references += barfoo
+    assert(ctx.references.length == 4)
+  }
+
   test("SPARK-18016: define mutable states by using an array") {
     val ctx1 = new CodegenContext
     for (i <- 1 to CodeGenerator.OUTER_CLASS_VARIABLES_THRESHOLD + 10) {

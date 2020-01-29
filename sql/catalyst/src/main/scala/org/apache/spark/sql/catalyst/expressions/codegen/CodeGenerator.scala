@@ -119,6 +119,7 @@ class CodegenContext extends Logging {
 
   /**
    * Holding a list of objects that could be used passed into generated class.
+   * Holden references are distinct.
    */
   val references: mutable.ArrayBuffer[Any] = new mutable.ArrayBuffer[Any]()
 
@@ -131,8 +132,12 @@ class CodegenContext extends Logging {
    * time of use because number of fields in class is limited so we should reduce it.
    */
   def addReferenceObj(objName: String, obj: Any, className: String = null): String = {
-    val idx = references.length
-    references += obj
+    val idx = references.indexOf(obj) match {
+      case -1 =>
+        references += obj
+        references.length - 1
+      case i => i
+    }
     val clsName = Option(className).getOrElse(obj.getClass.getName)
     s"(($clsName) references[$idx] /* $objName */)"
   }
