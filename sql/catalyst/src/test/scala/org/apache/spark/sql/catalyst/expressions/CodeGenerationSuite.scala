@@ -416,22 +416,30 @@ class CodeGenerationSuite extends SparkFunSuite with ExpressionEvalHelper {
   test("`references` array should only contain distinct refs and can be dynamically mutated") {
     val ctx = new CodegenContext
 
-    val foo = new Object()
-    val bar = new Object()
+    val foo = 0
+    val bar = ""
     val foobar = new Object()
-    val barfoo = new Object()
-
-    ctx.addReferenceObj("foo1", foo)
-    ctx.addReferenceObj("foo2", foo)
-    ctx.addReferenceObj("bar", bar)
-    ctx.addReferenceObj("foo3", foo)
+    assert(ctx.addReferenceObj("foo1", foo)
+      .equals("((java.lang.Integer) references[0] /* foo1 */)"))
+    assert(ctx.addReferenceObj("foo2", foo)
+      .equals("((java.lang.Integer) references[0] /* foo2 */)"))
+    assert(ctx.addReferenceObj("bar", bar)
+      .equals("((java.lang.String) references[1] /* bar */)"))
+    assert(ctx.addReferenceObj("foo3", foo)
+      .equals("((java.lang.Integer) references[0] /* foo3 */)"))
     assert(ctx.references.length == 2)
 
-    ctx.addReferenceObj("foobar", foobar)
+    assert(ctx.addReferenceObj("foobar1", foobar)
+      .equals("((java.lang.Object) references[2] /* foobar1 */)"))
+    assert(ctx.addReferenceObj("foobar2", foobar)
+      .equals("((java.lang.Object) references[2] /* foobar2 */)"))
     assert(ctx.references.length == 3)
 
-    ctx.references += barfoo
-    assert(ctx.references.length == 4)
+    // references should support persistent direct mutation (e.g. in `CodegenFallback.doGenCode`)
+    ctx.references += foo
+    ctx.references += bar
+    ctx.references += foobar
+    assert(ctx.references.length == 6)
   }
 
   test("SPARK-18016: define mutable states by using an array") {

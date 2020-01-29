@@ -119,12 +119,12 @@ class CodegenContext extends Logging {
 
   /**
    * Holding a list of objects that could be used passed into generated class.
-   * Holden references are distinct.
+   * References held are distinct.
    */
   val references: mutable.ArrayBuffer[Any] = new mutable.ArrayBuffer[Any]()
 
   /**
-   * Add an object to `references`.
+   * Add an object to `references` if not already present.
    *
    * Returns the code to access it.
    *
